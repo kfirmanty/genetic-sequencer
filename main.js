@@ -9,20 +9,6 @@ const inputs = {
   iterationsPerCycle: 1
 };
 
-//---MAX INPUT HANDLERS
-[
-  { name: "mutationChance" },
-  { name: "populationSize", type: "int" },
-  { name: "breedingPopulationSize", type: "int" },
-  { name: "iterationsPerCycle", type: "int" }
-].forEach(({ name, scale, min, type }) =>
-  maxApi.addHandler(name, val => {
-    inputs[name] = type == "int" ? Math.floor(val) : val;
-  })
-);
-
-maxApi.addHandler("target", (index, val) => (inputs.target[index - 1] = val));
-
 //-----GENETIC ALGORITHM FUNCTIONS
 const toScore = (steps, target) =>
   target.reduce((acc, v, i) => (v !== steps[i] ? ++acc : acc), 0);
@@ -83,10 +69,35 @@ const iterate = ({
   );
 };
 
-const initPopulation = (size, target) =>
-  range(size).map(_ => range(target.length).map(toss));
+const initPopulation = ({ target, populationSize }) =>
+  range(populationSize).map(_ => range(target.length).map(toss));
 
-let population = initPopulation(inputs.populationSize, inputs.target);
+let population = initPopulation(inputs);
+
+//---MAX INPUT HANDLERS
+[
+  { name: "mutationChance" },
+  { name: "populationSize", type: "int" },
+  { name: "breedingPopulationSize", type: "int" },
+  { name: "iterationsPerCycle", type: "int" }
+].forEach(({ name, scale, min, type }) =>
+  maxApi.addHandler(name, val => {
+    inputs[name] = type == "int" ? Math.floor(val) : val;
+  })
+);
+
+maxApi.addHandler("target", (index, val) => (inputs.target[index - 1] = val));
+
+maxApi.addHandler("randomizePopulation", _ => {
+  population = initPopulation(inputs);
+  const { target, breedingPopulationSize } = inputs;
+  const closest = selectClosest({
+    population,
+    target,
+    breedingPopulationSize
+  });
+  maxApi.outlet(closest[0]);
+});
 
 maxApi.addHandler("generate", () => {
   const {
@@ -111,7 +122,7 @@ maxApi.addHandler("generate", () => {
   const closest = selectClosest({
     population,
     target,
-    breedingPopulationSize: breedingPopulationSize
+    breedingPopulationSize
   });
   maxApi.outlet(closest[0]);
 });
