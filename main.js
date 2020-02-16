@@ -3,7 +3,7 @@ const maxApi = require("max-api");
 //----ALGORITHM INPUTS
 const inputs = {
   target: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-  populationSize: 97,
+  populationSize: 51,
   mutationChance: 0.2,
   breedingPopulationSize: 2,
   iterationsPerCycle: 1
