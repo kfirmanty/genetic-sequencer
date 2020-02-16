@@ -86,7 +86,16 @@ let population = initPopulation(inputs);
   })
 );
 
-maxApi.addHandler("target", (index, val) => (inputs.target[index - 1] = val));
+maxApi.addHandler(
+  "targetChange",
+  (index, val) => (inputs.target[index - 1] = val)
+);
+
+maxApi.addHandler("targetInit", (command, ...steps) => {
+  if (command == "extra1") {
+    inputs.target = steps;
+  }
+});
 
 maxApi.addHandler("randomizePopulation", _ => {
   population = initPopulation(inputs);
