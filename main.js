@@ -6,7 +6,8 @@ const inputs = {
   populationSize: 51,
   mutationChance: 0.2,
   breedingPopulationSize: 2,
-  iterationsPerCycle: 1
+  iterationsPerCycle: 1,
+  seqLength: 16
 };
 
 //-----GENETIC ALGORITHM FUNCTIONS
@@ -95,6 +96,19 @@ maxApi.addHandler("targetInit", (command, ...steps) => {
   if (command == "extra1") {
     inputs.target = steps;
   }
+});
+
+maxApi.addHandler("seqLength", seqLength => {
+  const increased = seqLength > inputs.seqLength;
+  population.forEach(p => {
+    p.length = seqLength;
+    if (increased) {
+      for (let i = inputs.seqLength; i < seqLength; i++) {
+        p[i] = toss();
+      }
+    }
+  });
+  inputs.seqLength = seqLength;
 });
 
 maxApi.addHandler("randomizePopulation", _ => {
